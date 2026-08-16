@@ -1,1344 +1,853 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Permis Côtier Français - Entraîneur Personnel</title>
-  
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            ocean: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              500: '#0284c7',
-              800: '#075985',
-              900: '#0c4a6e',
-              950: '#082f49',
-            },
-            glass: {
-              bg: 'rgba(15, 23, 42, 0.75)',
-              card: 'rgba(30, 41, 59, 0.7)',
-              border: 'rgba(255, 255, 255, 0.12)',
-              hover: 'rgba(51, 65, 85, 0.8)',
-            }
-          },
-          fontFamily: {
-            sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'sans-serif'],
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permis Côtier Pro — Application Interactive</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            --glass-bg: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-card: rgba(30, 41, 59, 0.7);
+            --glass-card-hover: rgba(51, 65, 85, 0.8);
+            --accent-blue: #38bdf8;
+            --accent-blue-glow: rgba(56, 189, 248, 0.3);
+            --accent-green: #4ade80;
+            --accent-green-glow: rgba(74, 222, 128, 0.3);
+            --accent-red: #f87171;
+            --accent-red-glow: rgba(248, 113, 113, 0.3);
+            --accent-orange: #fb923c;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-      }
-    }
-  </script>
 
-  <!-- React & Babel -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 12px;
+        }
 
-  <style>
-    body {
-      background: radial-gradient(circle at top right, #0f172a, #090d16, #020617);
-      min-height: 100vh;
-      color: #f8fafc;
-      touch-action: manipulation;
-    }
-    .glass-panel {
-      background: rgba(30, 41, 59, 0.65);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .glass-button {
-      background: rgba(51, 65, 85, 0.5);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .glass-button:active {
-      transform: scale(0.98);
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.5);
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(100, 116, 139, 0.5);
-      border-radius: 3px;
-    }
-  </style>
+        /* Container Téléphone / App UI */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 92vh;
+            max-height: 880px;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 36px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* En-tête Liquid Glass */
+        .app-header {
+            padding: 20px 20px 12px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .app-title-zone {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            box-shadow: 0 0 12px var(--accent-blue-glow);
+        }
+
+        .app-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .app-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Zones de contenu scrollables */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+        }
+
+        .app-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .app-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        /* Cartes & Composants Glass */
+        .glass-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 18px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(12px);
+            transition: all 0.2s ease;
+        }
+
+        /* Boutons d'interaction */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            box-shadow: 0 4px 20px var(--accent-blue-glow);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+            border: 1px solid rgba(74, 222, 128, 0.4);
+            box-shadow: 0 4px 20px var(--accent-green-glow);
+        }
+
+        /* Options QCM */
+        .option-card {
+            background: var(--glass-card);
+            border: 1.5px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .option-card:hover {
+            background: var(--glass-card-hover);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .option-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .option-card.selected {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 15px var(--accent-blue-glow);
+        }
+
+        .option-card.selected .option-badge {
+            background: var(--accent-blue);
+            color: #0f172a;
+        }
+
+        .option-card.correct {
+            background: rgba(74, 222, 128, 0.2) !important;
+            border-color: var(--accent-green) !important;
+            box-shadow: 0 0 15px var(--accent-green-glow) !important;
+        }
+
+        .option-card.correct .option-badge {
+            background: var(--accent-green) !important;
+            color: #0f172a !important;
+        }
+
+        .option-card.incorrect {
+            background: rgba(248, 113, 113, 0.2) !important;
+            border-color: var(--accent-red) !important;
+            box-shadow: 0 0 15px var(--accent-red-glow) !important;
+        }
+
+        .option-card.incorrect .option-badge {
+            background: var(--accent-red) !important;
+            color: #ffffff !important;
+        }
+
+        .option-text {
+            font-size: 14px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        /* Progression & Statut */
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* SVG Viewer / Schema Zone */
+        .svg-container {
+            width: 100%;
+            height: 160px;
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Navigation Bar au bas */
+        .nav-bar {
+            padding: 12px 20px 20px 20px;
+            background: rgba(15, 23, 42, 0.9);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: none;
+            border: none;
+        }
+
+        .nav-item.active {
+            color: var(--accent-blue);
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Tags & Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-blue { background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+        .badge-orange { background: rgba(251, 146, 60, 0.2); color: var(--accent-orange); border: 1px solid var(--accent-orange); }
+        .badge-green { background: rgba(74, 222, 128, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+
+        /* Animation Feedback */
+        .feedback-box {
+            animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stat Grid */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 22px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+    </style>
 </head>
-<body class="font-sans antialiased selection:bg-cyan-500 selection:text-white">
-  <div id="root"></div>
+<body>
 
-  <script type="text/babel">
-    const { useState, useEffect, useMemo } = React;
-
-    // --- CATEGORIES OFFICIELLES DU PERMIS CÔTIER ---
-    const CATEGORIES = {
-      1: "Balisage et signalisation maritime",
-      2: "Règles de barre et de route / RIPAM",
-      3: "Feux et marques des navires",
-      4: "Signaux sonores",
-      5: "Navigation",
-      6: "Sécurité",
-      7: "Matériel et équipements obligatoires",
-      8: "Météorologie",
-      9: "Marées et courants",
-      10: "VHF et communications",
-      11: "Réglementation maritime",
-      12: "Protection de l'environnement",
-      13: "Responsabilités du plaisancier",
-      14: "Situations pratiques de navigation"
-    };
-
-    // --- COMPOSANTS DE SCHÉMAS & ILLUSTRATIONS SVG NEUTRES ---
-    const DiagramVisual = ({ id }) => {
-      switch(id) {
-        case 'cardinale_nord':
-          return (
-            <svg viewBox="0 0 200 160" class="w-full max-h-48 rounded-xl bg-slate-900/80 p-2 border border-slate-700/50">
-              <rect width="200" height="160" fill="#0f172a" rx="8" />
-              {/* Eau */}
-              <path d="M 0 120 Q 50 115, 100 120 T 200 120 L 200 160 L 0 160 Z" fill="#0284c7" opacity="0.4" />
-              {/* Corps de bouée : Noir en haut, Jaune en bas */}
-              <rect x="85" y="55" width="30" height="30" fill="#0f172a" stroke="#ffffff" strokeWidth="0.5"/>
-              <rect x="85" y="85" width="30" height="30" fill="#eab308" stroke="#ffffff" strokeWidth="0.5"/>
-              {/* Voyant : 2 cônes noirs pointe vers le haut */}
-              <polygon points="100,20 90,35 110,35" fill="#000000" stroke="#ffffff" strokeWidth="0.5" />
-              <polygon points="100,38 90,53 110,53" fill="#000000" stroke="#ffffff" strokeWidth="0.5" />
-              {/* Ligne de flottaison */}
-              <line x1="70" y1="115" x2="130" y2="115" stroke="#38bdf8" strokeWidth="3" opacity="0.8" />
-            </svg>
-          );
-        case 'ripam_croisement':
-          return (
-            <svg viewBox="0 0 240 160" class="w-full max-h-48 rounded-xl bg-slate-900/80 p-2 border border-slate-700/50">
-              <rect width="240" height="160" fill="#0f172a" rx="8" />
-              {/* Grille boussole neutre */}
-              <circle cx="120" cy="80" r="60" stroke="#334155" strokeWidth="1" fill="none" strokeDasharray="4 4" />
-              {/* Navire A (Moteur) venant du bas vers le haut */}
-              <g transform="translate(120, 120) rotate(0)">
-                <path d="M -8 15 L 0 -15 L 8 15 Z" fill="#0284c7" stroke="#38bdf8" strokeWidth="1.5" />
-                <text x="-20" y="25" fill="#38bdf8" fontSize="12" fontWeight="bold">Navire A</text>
-              </g>
-              {/* Navire B (Moteur) venant de la droite vers la gauche */}
-              <g transform="translate(180, 80) rotate(-90)">
-                <path d="M -8 15 L 0 -15 L 8 15 Z" fill="#f59e0b" stroke="#fcd34d" strokeWidth="1.5" />
-                <text x="15" y="5" fill="#fcd34d" fontSize="12" fontWeight="bold">Navire B</text>
-              </g>
-              {/* Trajectoires */}
-              <line x1="120" y1="120" x2="120" y2="40" stroke="#0284c7" strokeWidth="1.5" strokeDasharray="3 3" />
-              <line x1="180" y1="80" x2="60" y2="80" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="3 3" />
-            </svg>
-          );
-        case 'feux_chalutier':
-          return (
-            <svg viewBox="0 0 200 140" class="w-full max-h-48 rounded-xl bg-slate-950 p-2 border border-slate-700/50">
-              <rect width="200" height="140" fill="#020617" rx="8" />
-              {/* Mât de signalisation feux */}
-              <line x1="100" y1="20" x2="100" y2="100" stroke="#475569" strokeWidth="2" />
-              {/* Feu Vert (Haut) */}
-              <circle cx="100" cy="35" r="8" fill="#22c55e" className="animate-pulse" />
-              <circle cx="100" cy="35" r="14" fill="#22c55e" opacity="0.3" />
-              {/* Feu Blanc (Bas) en alignement vertical */}
-              <circle cx="100" cy="65" r="8" fill="#ffffff" />
-              <circle cx="100" cy="65" r="14" fill="#ffffff" opacity="0.3" />
-              {/* Feux de côté au niveau du pont */}
-              <circle cx="60" cy="95" r="6" fill="#ef4444" /> {/* Bâbord */}
-              <circle cx="140" cy="95" r="6" fill="#22c55e" /> {/* Tribord */}
-            </svg>
-          );
-        case 'carte_alignement':
-          return (
-            <svg viewBox="0 0 240 150" class="w-full max-h-48 rounded-xl bg-amber-50/10 p-2 border border-slate-700/50">
-              <rect width="240" height="150" fill="#0f172a" rx="8" />
-              {/* Ligne de fond/carte */}
-              <path d="M 0 30 Q 120 50, 240 20 L 240 0 L 0 0 Z" fill="#b45309" opacity="0.3" />
-              {/* Amer postérieur & antérieur */}
-              <circle cx="180" cy="35" r="5" fill="#f59e0b" stroke="#ffffff" />
-              <circle cx="130" cy="60" r="5" fill="#f59e0b" stroke="#ffffff" />
-              {/* Ligne d'alignement 234° */}
-              <line x1="30" y1="105" x2="210" y2="20" stroke="#ef4444" strokeWidth="2" strokeDasharray="5 3" />
-              <text x="35" y="125" fill="#ef4444" fontSize="12" fontWeight="bold">234°</text>
-              {/* Bateau sur l'alignement */}
-              <circle cx="80" cy="82" r="4" fill="#38bdf8" />
-            </svg>
-          );
-        case 'pavillon_alpha':
-          return (
-            <svg viewBox="0 0 180 130" class="w-full max-h-48 rounded-xl bg-slate-900/80 p-2 border border-slate-700/50">
-              <rect width="180" height="130" fill="#0f172a" rx="8" />
-              {/* Mât */}
-              <line x1="30" y1="15" x2="30" y2="115" stroke="#94a3b8" strokeWidth="3" />
-              {/* Pavillon Alpha : Blanc côté mât, Bleu à queue de pie */}
-              <g transform="translate(32, 25)">
-                <polygon points="0,0 50,0 50,60 0,60" fill="#ffffff" stroke="#cbd5e1" strokeWidth="0.5" />
-                <polygon points="50,0 100,0 75,30 100,60 50,60" fill="#1d4ed8" />
-              </g>
-            </svg>
-          );
-        case 'danger_isole':
-          return (
-            <svg viewBox="0 0 200 150" class="w-full max-h-48 rounded-xl bg-slate-900/80 p-2 border border-slate-700/50">
-              <rect width="200" height="150" fill="#0f172a" rx="8" />
-              <path d="M 0 110 Q 50 105, 100 110 T 200 110 L 200 150 L 0 150 Z" fill="#0284c7" opacity="0.4" />
-              {/* Bouée Danger Isolé : Noir avec bande rouge */}
-              <rect x="85" y="55" width="30" height="15" fill="#000000" />
-              <rect x="85" y="70" width="30" height="15" fill="#dc2626" />
-              <rect x="85" y="85" width="30" height="15" fill="#000000" />
-              {/* Voyant : 2 sphères noires superposées */}
-              <circle cx="100" cy="25" r="8" fill="#000000" stroke="#ffffff" strokeWidth="0.5" />
-              <circle cx="100" cy="42" r="8" fill="#000000" stroke="#ffffff" strokeWidth="0.5" />
-            </svg>
-          );
-        case 'voilier_moteur_rattrapage':
-          return (
-            <svg viewBox="0 0 220 150" class="w-full max-h-48 rounded-xl bg-slate-900/80 p-2 border border-slate-700/50">
-              <rect width="220" height="150" fill="#0f172a" rx="8" />
-              {/* Voilier devancé (A) */}
-              <g transform="translate(110, 45)">
-                <polygon points="0,-12 10,10 -10,10" fill="#22c55e" stroke="#ffffff" strokeWidth="1" />
-                <text x="-25" y="-18" fill="#ffffff" fontSize="11">Voilier (devancé)</text>
-              </g>
-              {/* Navire à moteur rattrapant (B) venant du secteur arrière >22.5° */}
-              <g transform="translate(110, 115)">
-                <polygon points="0,-12 8,10 -8,10" fill="#0284c7" stroke="#ffffff" strokeWidth="1" />
-                <text x="-45" y="22" fill="#38bdf8" fontSize="11">Navire à moteur (rattrapant)</text>
-              </g>
-              {/* Flèche de dépassement */}
-              <path d="M 110 100 L 110 65" stroke="#f59e0b" strokeWidth="2" strokeDasharray="4 3" markerEnd="url(#arrow)" />
-            </svg>
-          );
-        case 'marque_jour_restreinte':
-          return (
-            <svg viewBox="0 0 200 140" class="w-full max-h-48 rounded-xl bg-slate-900/80 p-2 border border-slate-700/50">
-              <rect width="200" height="140" fill="#0f172a" rx="8" />
-              <line x1="100" y1="15" x2="100" y2="125" stroke="#64748b" strokeWidth="3" />
-              {/* Boule noire */}
-              <circle cx="100" cy="35" r="10" fill="#000000" stroke="#ffffff" strokeWidth="0.5" />
-              {/* Losange noir */}
-              <polygon points="100,52 112,70 100,88 88,70" fill="#000000" stroke="#ffffff" strokeWidth="0.5" />
-              {/* Boule noire */}
-              <circle cx="100" cy="105" r="10" fill="#000000" stroke="#ffffff" strokeWidth="0.5" />
-            </svg>
-          );
-        default:
-          return null;
-      }
-    };
-
-    // --- SÉRIE 1 : BANQUE DIAGNOSTIQUE INITIALE DE 20 QUESTIONS ---
-    const INITIAL_DIAGNOSTIC_QUESTIONS = [
-      {
-        id: 101,
-        categoryId: 1,
-        question: "En arrivant à proximité de ce balisage de jour, dans quel secteur géographique devez-vous naviguer pour rester en eaux saines ?",
-        diagramId: 'cardinale_nord',
-        isMultiple: false,
-        options: [
-          "Au Nord de la balise",
-          "Au Sud de la balise",
-          "À l'Est de la balise",
-          "À l'Ouest de la balise"
-        ],
-        correctIndices: [0],
-        rationale: "La balise présente deux cônes noirs pointés vers le haut et des couleurs noir en haut / jaune en bas. Il s'agit d'une marque cardinale NORD. Elle indique que les eaux les plus profondes et saines se trouvent au NORD de la balise.",
-        rule: "Marque Cardinale Nord : 2 cônes vers le HAUT, Noir en HAUT. Passer impérativement au NORD de la balise."
-      },
-      {
-        id: 102,
-        categoryId: 2,
-        question: "Vous êtes au barre de votre navire à moteur A. Vous croisez le navire B à moteur qui vient sur votre tribord (route de croisement). Quelles sont vos obligations réglementaires ?",
-        diagramId: 'ripam_croisement',
-        isMultiple: true,
-        options: [
-          "Vous devez vous écarter de la route du navire B",
-          "Vous devez manœuvrer de manière franche, claire et précoce",
-          "Vous devez si possible éviter de couper sa route sur l'avant",
-          "Le navire B doit s'écarter car vous venez de son côté bâbord"
-        ],
-        correctIndices: [0, 1, 2],
-        rationale: "Selon le RIPAM (Règle 15), lorsque deux navires à moteur se croisent, celui qui voit l'autre sur son tribord doit s'écarter et éviter de couper sa route sur l'avant. La manœuvre doit être franche et faite en temps utile.",
-        rule: "RIPAM Croisement : Priorité à droite. Si le navire vient de votre tribord, vous devez manœuvrer sans attendre."
-      },
-      {
-        id: 103,
-        categoryId: 11,
-        question: "Dans la bande littorale des 300 mètres à partir de la limite des eaux, sauf balisage ou arrêté local spécifique, quelle est la vitesse maximale autorisée ?",
-        isMultiple: false,
-        options: [
-          "3 nœuds",
-          "5 nœuds",
-          "8 nœuds",
-          "10 nœuds"
-        ],
-        correctIndices: [1],
-        rationale: "La vitesse dans la bande des 300 mètres est strictement limitée à 5 nœuds pour tous les navires et engins de plaisance à moteur afin de protéger les baigneurs et riverains.",
-        rule: "Bande des 300m = 5 nœuds maximum (environ 9,25 km/h)."
-      },
-      {
-        id: 104,
-        categoryId: 3,
-        question: "De nuit, vous apercevez un navire montrant un feu vert surmonté d'un feu blanc en alignement vertical, ainsi que ses feux de côté. Quelle est son activité ?",
-        diagramId: 'feux_chalutier',
-        isMultiple: true,
-        options: [
-          "Il s'agit d'un navire effectuant le chalutage (pêche au chalut)",
-          "C'est un navire en train d'effectuer une opération de pêche",
-          "Il s'agit d'un voilier au moteur de moins de 7 mètres",
-          "C'est un navire non maître de sa manœuvre"
-        ],
-        correctIndices: [0, 1],
-        rationale: "Les feux superposés Vert sur Blanc indiquent un navire faisant du chalutage (pêche avec engin traînant). Les navires en pêche sont privilégiés par rapport aux navires à moteur ordinaires.",
-        rule: "Vert sur Blanc = Chalutier en pêche (Moyen mnémotechnique : Vert sur Blanc = Chalutier en blanc)."
-      },
-      {
-        id: 105,
-        categoryId: 10,
-        question: "Concernant l'utilisation du canal 16 sur la VHF marine en navigation côtière, quelles affirmations sont correctes ?",
-        isMultiple: true,
-        options: [
-          "Il est réservé exclusivement à la détresse, l'urgence, la sécurité et l'appel initial",
-          "Il est autorisé d'y réaliser de longues conversations familiales",
-          "La puissance maximale d'émission autorisée pour la détresse est de 25 Watts",
-          "Il est veillé en permanence par les CROSS et les stations côtières"
-        ],
-        correctIndices: [0, 2, 3],
-        rationale: "Le canal 16 est le canal international de sécurité et détresse. Dès le contact établi, les navires doivent basculer sur un canal de travail (ex: canal 6, 8, 72, 77) pour ne pas encombrer le 16.",
-        rule: "Canal 16 = Détresse et Sécurité uniquement. Passer immédiatement sur un canal de dégagement."
-      },
-      {
-        id: 106,
-        categoryId: 6,
-        question: "En cas de chute d'un passager à la mer (Homme à la mer) de jour, quelle est la toute première action réflexe à effectuer ?",
-        isMultiple: false,
-        options: [
-          "Lancer immédiatement une bouée/engin de repérage et crier 'Homme à la mer'",
-          "Émettre immédiatement un message Mayday sur la VHF",
-          "Faire faire demi-tour au navire en accélérant",
-          "Plonger immédiatement pour aller chercher le passager"
-        ],
-        correctIndices: [0],
-        rationale: "Le premier geste réflexe est de jeter du matériel de flottabilité/repérage (bouée courronne, feu retournable) et de garder le contact visuel permanent sans quitter la victime des yeux.",
-        rule: "Homme à la mer = 1. Jeter un engin de repérage 2. Ne jamais quitter la victime des yeux 3. Alerter l'équipage."
-      },
-      {
-        id: 107,
-        categoryId: 9,
-        question: "Lors d'une période de marée de Vive-Eau (VE), quelles caractéristiques observez-vous par rapport à une marée de Morte-Eau (ME) ?",
-        isMultiple: false,
-        options: [
-          "Le marnage est plus fort et les coefficients sont supérieurs à 70",
-          "Le marnage est plus faible et les coefficients sont inférieurs à 45",
-          "La pleine mer est plus basse et la basse mer est plus haute",
-          "Les courants de marée sont totalement nuls"
-        ],
-        correctIndices: [0],
-        rationale: "Les vives-eaux se produisent lors de la pleine et de la nouvelle lune. Le marnage (différence entre basse et pleine mer) est maximal, avec des coefficients allant de 71 à 120, générant des courants forts.",
-        rule: "Vive-Eau (VE) = Coeff > 70, Fort marnage, fort courant. Morte-Eau (ME) = Coeff < 70, Faible marnage."
-      },
-      {
-        id: 108,
-        categoryId: 4,
-        question: "Par temps de brume ou de visibilité réduite, vous entendez un son prolongé émis toutes les deux minutes au maximum. Quel est le navire émetteur ?",
-        isMultiple: false,
-        options: [
-          "Un navire à moteur faisant route et ayant de l'aire (faisant route sur l'eau)",
-          "Un navire à moteur stoppé et ne faisant pas route",
-          "Un voilier faisant route à la voile",
-          "Un navire au mouillage"
-        ],
-        correctIndices: [0],
-        rationale: "En visibilité réduite, un navire à moteur faisant route émet 1 son prolongé (─) toutes les 2 minutes. S'il était stoppé sans faire route, il émettrait 2 sons prolongés (─ ─).",
-        rule: "Brume : 1 son prolongé = Navire à moteur faisant route avec de l'aire. 2 sons prolongés = Stoppé sans aire."
-      },
-      {
-        id: 109,
-        categoryId: 7,
-        question: "Pour une navigation côtière située entre 2 milles et 6 milles d'un abri, quels équipements de sécurité sont obligatoires à bord ?",
-        isMultiple: true,
-        options: [
-          "Un équipement individuel de flottabilité (gilet 100N minimum) par personne",
-          "Trois feux à main rouges de détresse en cours de validité",
-          "Un miroir de signalisation ou un moyen de repérage lumineux",
-          "Un radeau de survie hauturier (Bib)"
-        ],
-        correctIndices: [0, 1, 2],
-        rationale: "L'équipement Côtier (2 à 6 milles) impose les gilets 100N minimum, 3 feux à main, le miroir/moyen lumineux, le dispositif de remorquage, l'annuaire des marées, etc. Le radeau de survie n'est obligatoire qu'au-delà de 6 milles (Hauturier).",
-        rule: "Radeau de survie obligatoire uniquement en navigation Hauturière (> 6 milles d'un abri)."
-      },
-      {
-        id: 110,
-        categoryId: 8,
-        question: "Sur un bulletin météorologique marine, qu'annonce un avis de 'Coup de vent' (BMS) émis par Météo-France ?",
-        isMultiple: false,
-        options: [
-          "Un vent atteignant la force 7 Beaufort (28 à 33 nœuds)",
-          "Un vent atteignant la force 8 Beaufort (34 à 40 nœuds)",
-          "Un vent atteignant la force 9 Beaufort (41 à 47 nœuds)",
-          "Un vent atteignant la force 10 Beaufort"
-        ],
-        correctIndices: [1],
-        rationale: "BMS Grand Frais = Force 7 Beaufort. BMS Coup de vent = Force 8 Beaufort. BMS Fort coup de vent = Force 9 Beaufort. BMS Tempête = Force 10 Beaufort.",
-        rule: "Avis météo : Grand Frais = F7, Coup de vent = F8, Fort coup de vent = F9, Tempête = F10."
-      },
-      {
-        id: 111,
-        categoryId: 12,
-        question: "En Méditerranée, dans les zones identifiées avec présence d'herbiers de Posidonie, quelle restriction s'applique à la plaisance ?",
-        isMultiple: false,
-        options: [
-          "Interdiction ou réglementation stricte du mouillage sur ancre pour éviter l'arrachage",
-          "Obligation d'utiliser uniquement une ancre à soc de charrue de plus de 15 kg",
-          "Interdiction d'utiliser le moteur principal",
-          "Obligation de mouiller exclusivement entre minuit et 6 heures"
-        ],
-        correctIndices: [0],
-        rationale: "Les herbiers de Posidonie sont une espèce protégée majeure. Le mouillage des navires (notamment de plus de 20m ou selon les arrêtés préfectoraux locaux) y est strictement interdit ou limité aux zones d'amarrage balisées.",
-        rule: "Posidonie = Protection absolue. Interdiction d'ancrer pour ne pas détruire les herbiers."
-      },
-      {
-        id: 112,
-        categoryId: 13,
-        question: "En tant que chef de bord d'un navire de plaisance, quelles sont vos responsabilités obligatoires avant d'appareiller ?",
-        isMultiple: true,
-        options: [
-          "S'assurer de la présence et de la validité du matériel de sécurité exigé",
-          "Consulter les prévisions météorologiques et calculer la réserve de carburant",
-          "Informer les passagers des consignes de sécurité et de l'emplacement des gilets",
-          "Détenir impérativement un brevet de Capitaine 200 de la marine marchande"
-        ],
-        correctIndices: [0, 1, 2],
-        rationale: "Le chef de bord est le seul responsable de la sécurité du navire, des passagers et du respect des règles d'armement et de météo. Aucun brevet marchand n'est requis pour la plaisance.",
-        rule: "Le Chef de Bord assume l'intégralité de la responsabilité civile, administrative et pénale du navire."
-      },
-      {
-        id: 113,
-        categoryId: 5,
-        question: "Vous naviguez en suivant un alignement à deux amers relevés sur la carte marine au 234°. Que signifie concrètement cet alignement ?",
-        diagramId: 'carte_alignement',
-        isMultiple: false,
-        options: [
-          "La route vraie à suivre sur l'eau pour rester dans le chenal sain est le 234°",
-          "Le compas du bateau doit obligatoirement indiquer 234° quelle que soit la dérive",
-          "Le vent provient exactement du relèvement 234°",
-          "La profondeur minimale d'eau est de 23,4 mètres"
-        ],
-        correctIndices: [0],
-        rationale: "Un alignement de deux amers fixes sur la carte définit une ligne de position et une Route Vraie (Rv) sûre. Le cap compas peut varier selon la dérive due au vent ou au courant.",
-        rule: "Alignement = Route Vraie (Rv) garantie. Le cap compas s'ajuste pour corriger le vent et le courant."
-      },
-      {
-        id: 114,
-        categoryId: 14,
-        question: "Vous apercevez ce pavillon Alpha (Blanc et Bleu à queue de pie) hissé sur une embarcation ou une bouée. Quelles sont vos obligations ?",
-        diagramId: 'pavillon_alpha',
-        isMultiple: true,
-        options: [
-          "Réduire sa vitesse et passer à une distance minimale de sécurité (ex: 100 mètres)",
-          "Maintenir une veille visuelle et auditive renforcée quant aux plongeurs en surface",
-          "Mouiller immédiatement son ancre juste à côté du navire",
-          "Émettre trois sons prolongés au klaxon"
-        ],
-        correctIndices: [0, 1],
-        rationale: "Le pavillon Alpha signifie : 'J'ai un plongeur en plongée ; tenez-vous à distance et avancez à lente vitesse'. Les plaisanciers doivent s'écarter (100m selon arrêtés préfectoraux).",
-        rule: "Pavillon Alpha = Plongeur en sous-surface. Réduire sa vitesse et s'écarter au minimum de 100 mètres."
-      },
-      {
-        id: 115,
-        categoryId: 1,
-        question: "Vous croisez cette balise avec deux sphères noires superposées et des bandes noires et rouges. Que marque-t-elle ?",
-        diagramId: 'danger_isole',
-        isMultiple: false,
-        options: [
-          "Un danger isolé de petite étendue, entouré d'eau saine",
-          "Un chenal très étroit réservé aux navires prioritaires",
-          "Une zone totalement interdite à la navigation de plaisance",
-          "Une marque d'eaux saines indiquant l'atterrage"
-        ],
-        correctIndices: [0],
-        rationale: "La balise de Danger Isolé (Noir-Rouge-Noir avec 2 sphères noires) est posée directement sur le danger (roche, épave). On peut la parer en passant de n'importe quel côté tout autour.",
-        rule: "Danger Isolé = Noir / Rouge / Noir + 2 sphères noires. Eau saine tout autour."
-      },
-      {
-        id: 116,
-        categoryId: 2,
-        question: "Un navire à moteur rattrape un voilier naviguant à la voile par le secteur arrière (> 22,5° sur l'arrière du travers). Quel navire doit s'écarter ?",
-        diagramId: 'voilier_moteur_rattrapage',
-        isMultiple: false,
-        options: [
-          "Le navire à moteur rattrapant doit s'écarter de la route du voilier",
-          "Le voilier doit s'écarter car le navire à moteur est plus rapide",
-          "Les deux navires doivent venir simultanément sur leur tribord",
-          "Le voilier doit s'écarter car il est moins manœuvrant en cas de calme plat"
-        ],
-        correctIndices: [0],
-        rationale: "Selon la règle 13 du RIPAM, tout navire qui en rattrape un autre (qu'il soit à moteur ou à voile) DOIT s'écarter de la route du navire rattrapé. Le navire rattrapant n'est JAMAIS privilégié.",
-        rule: "Règle absolue du RIPAM : Le navire rattrapant s'écarte TOUJOURS du navire rattrapé."
-      },
-      {
-        id: 117,
-        categoryId: 3,
-        question: "De jour, vous apercevez sur un navire trois marques noires superposées en ligne verticale : Boule - Losange - Boule. Quelle est sa situation ?",
-        diagramId: 'marque_jour_restreinte',
-        isMultiple: false,
-        options: [
-          "C'est un navire à capacité de manœuvre restreinte (ex: travaux sous-marins, dragage)",
-          "C'est un navire non maître de sa manœuvre en raison d'une avarie",
-          "C'est un navire handicapé par son tirant d'eau",
-          "C'est un navire échoué"
-        ],
-        correctIndices: [0],
-        rationale: "La marque de jour 'Boule - Losange - Boule' signale un navire dont la capacité à manœuvrer est restreinte par la nature de ses travaux. Il est privilégié sur les navires ordinaires.",
-        rule: "Boule / Losange / Boule = Navire à capacité de manœuvre restreinte (Privilégié)."
-      },
-      {
-        id: 118,
-        categoryId: 6,
-        question: "Concernant les extincteurs d'incendie à bord d'un navire de plaisance à moteur, quelles exigences devez-vous respecter ?",
-        isMultiple: true,
-        options: [
-          "Être adaptés au type de combustible utilisé (essence, diesel, tableau électrique)",
-          "Avoir leurs dates de contrôle et de péremption rigoureusement à jour",
-          "Être immédiatement accessibles et placés près des postes de pilotage et moteur",
-          "Avoir obligatoirement 5 extincteurs quelle que soit la taille du navire"
-        ],
-        correctIndices: [0, 1, 2],
-        rationale: "Les extincteurs doivent correspondre aux risques du navire (classes A, B, C), être entretenus/vérifiés selon les prescriptions constructeur et rester d'accès immédiat sans clé.",
-        rule: "Extincteurs : Accessibilité immédiate, adaptés aux risques, validité à jour."
-      },
-      {
-        id: 119,
-        categoryId: 9,
-        question: "Comment définit-on la 'Hauteur d'eau' à un instant précis dans une zone de navigation ?",
-        isMultiple: false,
-        options: [
-          "La distance verticale entre le zéro hydrographique (fond des cartes) et la surface de la mer",
-          "La profondeur d'eau sondée affichée directement en chiffre noir sur la carte marine",
-          "La hauteur atteinte par la marée haute au niveau des plus hautes mers",
-          "Le marnage divisé par le coefficient de marée"
-        ],
-        correctIndices: [0],
-        rationale: "La hauteur d'eau (H) est la mesure variable apportée par la marée au-dessus du zéro carte. La profondeur totale disponible (Sonde totale) = Sondé carte + Hauteur d'eau.",
-        rule: "Profondeur totale = Sonde Carte + Hauteur d'eau de marée."
-      },
-      {
-        id: 120,
-        categoryId: 10,
-        question: "Vous entendez à la VHF l'émission répétée trois fois du signal : 'PAN PAN, PAN PAN, PAN PAN'. De quoi s'agit-il ?",
-        isMultiple: false,
-        options: [
-          "Un message d'Urgence concernant la sécurité d'un navire ou d'une personne sans danger grave et imminent",
-          "Un message de Détresse absolue (Mayday) exigeant une assistance immédiate pour péril de vie",
-          "Un simple bulletin d'information météorologique ou avis aux navigateurs (Securite)",
-          "Une demande de place d'escale auprès de la capitainerie du port"
-        ],
-        correctIndices: [0],
-        rationale: "PAN PAN est le signal d'URGENCE (panne moteur, blessure nécessitant avis médical). MAYDAY est le signal de DÉTRESSE (péril grave et imminent). SECURITE concerne la navigation/météo.",
-        rule: "Hiérarchie VHF : MAYDAY = Détresse (Vie en danger), PAN PAN = Urgence, SECURITE = Sécurité navigation."
-      }
-    ];
-
-    // --- APPLICATION PRINCIPALE REACT ---
-    function App() {
-      // Navigation Tabs: 'dashboard' | 'quiz' | 'exam' | 'mistakes' | 'progress' | 'weaknesses' | 'history'
-      const [activeTab, setActiveTab] = useState('dashboard');
-
-      // Profile & Saved State
-      const [userProfile, setUserProfile] = useState(() => {
-        const saved = localStorage.getItem('permis_cotier_profile');
-        if (saved) {
-          try { return JSON.parse(saved); } catch(e){}
-        }
-        return {
-          seriesCompleted: 0,
-          totalQuestionsAnswered: 0,
-          totalCorrectAnswers: 0,
-          mistakesHistory: [], // Array of mistake objects
-          completedSeriesLog: [],
-          categoryStats: Object.keys(CATEGORIES).reduce((acc, catId) => {
-            acc[catId] = { asked: 0, correct: 0 };
-            return acc;
-          }, {})
-        };
-      });
-
-      // Active Quiz State
-      const [quizState, setQuizState] = useState(() => {
-        const savedQuiz = localStorage.getItem('permis_cotier_active_quiz');
-        if (savedQuiz) {
-          try { return JSON.parse(savedQuiz); } catch(e){}
-        }
-        return {
-          seriesNumber: 1,
-          mode: 'diagnostic', // 'diagnostic' | 'adaptive' | 'exam' | 'mistakes_revision' | 'weakness_revision'
-          questions: INITIAL_DIAGNOSTIC_QUESTIONS,
-          currentIndex: 0,
-          selectedIndices: [],
-          isSubmitted: false,
-          userAnswers: {}, // index -> array of indices
-          score: 0,
-          isCompleted: false,
-          startTime: Date.now()
-        };
-      });
-
-      // Save state changes
-      useEffect(() => {
-        localStorage.setItem('permis_cotier_profile', JSON.stringify(userProfile));
-      }, [userProfile]);
-
-      useEffect(() => {
-        localStorage.setItem('permis_cotier_active_quiz', JSON.stringify(quizState));
-      }, [quizState]);
-
-      // Handle Option Selection (Supports Single & Multiple selection)
-      const handleOptionClick = (index) => {
-        if (quizState.isSubmitted) return;
-
-        const currentQ = quizState.questions[quizState.currentIndex];
-        
-        if (!currentQ.isMultiple) {
-          // Single Choice: Directly select and set single index
-          setQuizState(prev => ({ ...prev, selectedIndices: [index] }));
-        } else {
-          // Multiple Choice: Toggle option
-          setQuizState(prev => {
-            const exists = prev.selectedIndices.includes(index);
-            const updated = exists 
-              ? prev.selectedIndices.filter(i => i !== index)
-              : [...prev.selectedIndices, index];
-            return { ...prev, selectedIndices: updated };
-          });
-        }
-      };
-
-      // Submit Answer for current question
-      const handleSubmitAnswer = () => {
-        if (quizState.selectedIndices.length === 0 || quizState.isSubmitted) return;
-
-        const currentQ = quizState.questions[quizState.currentIndex];
-        const correctSet = new Set(currentQ.correctIndices);
-        const userSet = new Set(quizState.selectedIndices);
-
-        // Exact match required for full point
-        const isCorrect = correctSet.size === userSet.size && 
-          [...correctSet].every(idx => userSet.has(idx));
-
-        const newScore = isCorrect ? quizState.score + 1 : quizState.score;
-
-        setQuizState(prev => ({
-          ...prev,
-          isSubmitted: true,
-          score: newScore,
-          userAnswers: {
-            ...prev.userAnswers,
-            [prev.currentIndex]: prev.selectedIndices
-          }
-        }));
-
-        // Record stats immediately
-        setUserProfile(prev => {
-          const catStats = { ...prev.categoryStats };
-          const cId = currentQ.categoryId;
-          if (!catStats[cId]) catStats[cId] = { asked: 0, correct: 0 };
-          catStats[cId].asked += 1;
-          if (isCorrect) catStats[cId].correct += 1;
-
-          let newMistakes = [...prev.mistakesHistory];
-          if (!isCorrect) {
-            newMistakes.unshift({
-              questionId: currentQ.id,
-              categoryId: currentQ.categoryId,
-              questionText: currentQ.question,
-              diagramId: currentQ.diagramId,
-              userIndices: quizState.selectedIndices,
-              correctIndices: currentQ.correctIndices,
-              options: currentQ.options,
-              rationale: currentQ.rationale,
-              rule: currentQ.rule,
-              timestamp: Date.now()
-            });
-          }
-
-          return {
-            ...prev,
-            totalQuestionsAnswered: prev.totalQuestionsAnswered + 1,
-            totalCorrectAnswers: prev.totalCorrectAnswers + (isCorrect ? 1 : 0),
-            categoryStats: catStats,
-            mistakesHistory: newMistakes
-          };
-        });
-      };
-
-      // Next Question / Complete Series
-      const handleNextQuestion = () => {
-        if (quizState.currentIndex < quizState.questions.length - 1) {
-          setQuizState(prev => ({
-            ...prev,
-            currentIndex: prev.currentIndex + 1,
-            selectedIndices: [],
-            isSubmitted: false
-          }));
-        } else {
-          // Finish Series
-          setQuizState(prev => ({ ...prev, isCompleted: true }));
-
-          setUserProfile(prev => ({
-            ...prev,
-            seriesCompleted: prev.seriesCompleted + 1,
-            completedSeriesLog: [
-              {
-                seriesNumber: quizState.seriesNumber,
-                mode: quizState.mode,
-                score: quizState.score,
-                total: quizState.questions.length,
-                date: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-              },
-              ...prev.completedSeriesLog
-            ]
-          }));
-        }
-      };
-
-      // Start New Series (Adaptive or Exam)
-      const startNewSeries = (mode = 'adaptive') => {
-        // Generate 20 questions based on mode and weak points
-        let newQuestions = [...INITIAL_DIAGNOSTIC_QUESTIONS];
-        
-        // Shuffle questions and options
-        newQuestions = newQuestions.map(q => {
-          // Shuffle options while tracking correct indices
-          const indexedOptions = q.options.map((opt, idx) => ({ opt, isCorrect: q.correctIndices.includes(idx) }));
-          const shuffled = [...indexedOptions].sort(() => Math.random() - 0.5);
-          
-          return {
-            ...q,
-            options: shuffled.map(o => o.opt),
-            correctIndices: shuffled.reduce((acc, curr, idx) => {
-              if (curr.isCorrect) acc.push(idx);
-              return acc;
-            }, [])
-          };
-        }).sort(() => Math.random() - 0.5);
-
-        setQuizState({
-          seriesNumber: userProfile.seriesCompleted + 1,
-          mode: mode,
-          questions: newQuestions,
-          currentIndex: 0,
-          selectedIndices: [],
-          isSubmitted: false,
-          userAnswers: {},
-          score: 0,
-          isCompleted: false,
-          startTime: Date.now()
-        });
-
-        setActiveTab('quiz');
-      };
-
-      // Start Targeted Revision
-      const startMistakesRevision = () => {
-        if (userProfile.mistakesHistory.length === 0) return;
-        
-        const mistakeQuestions = userProfile.mistakesHistory.slice(0, 10).map((m, idx) => ({
-          id: 9000 + idx,
-          categoryId: m.categoryId,
-          question: m.questionText,
-          diagramId: m.diagramId,
-          isMultiple: m.correctIndices.length > 1,
-          options: m.options,
-          correctIndices: m.correctIndices,
-          rationale: m.rationale,
-          rule: m.rule
-        }));
-
-        setQuizState({
-          seriesNumber: userProfile.seriesCompleted + 1,
-          mode: 'mistakes_revision',
-          questions: mistakeQuestions,
-          currentIndex: 0,
-          selectedIndices: [],
-          isSubmitted: false,
-          userAnswers: {},
-          score: 0,
-          isCompleted: false,
-          startTime: Date.now()
-        });
-
-        setActiveTab('quiz');
-      };
-
-      // Calculated stats
-      const overallPercentage = userProfile.totalQuestionsAnswered > 0 
-        ? Math.round((userProfile.totalCorrectAnswers / userProfile.totalQuestionsAnswered) * 100) 
-        : 0;
-
-      const currentQ = quizState.questions[quizState.currentIndex];
-
-      return (
-        <div className="max-w-md mx-auto min-h-screen flex flex-col pb-20 pt-3 px-4 relative">
-          
-          {/* TOP HEADER / LOGO */}
-          <header className="flex items-center justify-between py-3 mb-2 border-b border-slate-800">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                <i data-lucide="compass" className="w-5 h-5 text-white animate-spin-slow"></i>
-              </div>
-              <div>
-                <h1 className="text-base font-bold text-white tracking-wide leading-tight">PERMIS CÔTIER</h1>
-                <p className="text-[10px] font-medium text-cyan-400 tracking-wider uppercase">Entraîneur Officiel</p>
-              </div>
+<div class="app-container">
+    <!-- Header -->
+    <div class="app-header">
+        <div class="app-title-zone">
+            <div class="app-logo">⚓</div>
+            <div>
+                <div class="app-title">Permis Côtier Pro</div>
+                <div class="app-subtitle" id="header-subtitle">Préparation Officielle</div>
             </div>
-
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-cyan-300">
-                Série {quizState.seriesNumber}
-              </span>
-            </div>
-          </header>
-
-          {/* MAIN CONTENT AREA DEPENDING ON ACTIVE TAB */}
-          <main className="flex-1 flex flex-col">
-
-            {/* --- TAB 1: DASHBOARD / ACCUEIL --- */}
-            {activeTab === 'dashboard' && (
-              <div className="space-y-4 animate-fade-in">
-                {/* GLASS HERO CARD */}
-                <div className="glass-panel p-5 rounded-3xl relative overflow-hidden border border-cyan-500/20 bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-cyan-950/40">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
-                  
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <span className="text-xs font-medium text-cyan-400 uppercase tracking-widest">Diagnostic & Niveau</span>
-                      <h2 className="text-xl font-bold text-white mt-0.5">Série 1 : Diagnostic</h2>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-2xl font-black text-cyan-400">{overallPercentage}%</span>
-                      <p className="text-[10px] text-slate-400">Taux global</p>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                    {userProfile.seriesCompleted === 0 
-                      ? "Bienvenue ! Commencez par la Série 1 de Diagnostic Initial (20 questions) pour mesurer votre niveau sur les 14 catégories officielles."
-                      : `Vous avez terminé ${userProfile.seriesCompleted} série(s). Continuez votre entraînement adaptatif pour consolider vos points faibles.`}
-                  </p>
-
-                  <div className="grid grid-cols-2 gap-2 mb-4 text-center">
-                    <div className="p-2.5 rounded-2xl bg-slate-800/60 border border-slate-700/50">
-                      <span className="block text-lg font-bold text-white">{userProfile.seriesCompleted}</span>
-                      <span className="text-[10px] text-slate-400 uppercase">Séries terminées</span>
-                    </div>
-                    <div className="p-2.5 rounded-2xl bg-slate-800/60 border border-slate-700/50">
-                      <span className="block text-lg font-bold text-rose-400">{userProfile.mistakesHistory.length}</span>
-                      <span className="text-[10px] text-slate-400 uppercase">Erreurs archivées</span>
-                    </div>
-                  </div>
-
-                  <button 
-                    onClick={() => {
-                      if (!quizState.isCompleted && quizState.currentIndex > 0) {
-                        setActiveTab('quiz');
-                      } else {
-                        startNewSeries('diagnostic');
-                      }
-                    }}
-                    className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 active:scale-95 transition-all"
-                  >
-                    <i data-lucide="play-circle" className="w-5 h-5"></i>
-                    {!quizState.isCompleted && quizState.currentIndex > 0 
-                      ? `Reprendre la Série ${quizState.seriesNumber} (Q${quizState.currentIndex + 1}/20)`
-                      : "Lancer la Série 1 (Diagnostic)"}
-                  </button>
-                </div>
-
-                {/* ACTION CARDS */}
-                <div className="grid grid-cols-2 gap-3">
-                  <button 
-                    onClick={() => startNewSeries('exam')}
-                    className="p-4 rounded-2xl glass-panel border border-amber-500/20 hover:border-amber-500/40 text-left flex flex-col justify-between group active:scale-95 transition-all"
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 mb-2">
-                      <i data-lucide="award" className="w-4 h-4"></i>
-                    </div>
-                    <div>
-                      <h3 className="text-xs font-bold text-white group-hover:text-amber-300">Examen Blanc</h3>
-                      <p className="text-[10px] text-slate-400 mt-0.5">20 questions en conditions réelles</p>
-                    </div>
-                  </button>
-
-                  <button 
-                    onClick={startMistakesRevision}
-                    disabled={userProfile.mistakesHistory.length === 0}
-                    className="p-4 rounded-2xl glass-panel border border-rose-500/20 hover:border-rose-500/40 text-left flex flex-col justify-between group disabled:opacity-50 active:scale-95 transition-all"
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-rose-500/20 flex items-center justify-center text-rose-400 mb-2">
-                      <i data-lucide="rotate-ccw" className="w-4 h-4"></i>
-                    </div>
-                    <div>
-                      <h3 className="text-xs font-bold text-white group-hover:text-rose-300">Réviser mes Erreurs</h3>
-                      <p className="text-[10px] text-slate-400 mt-0.5">{userProfile.mistakesHistory.length} question(s) ciblée(s)</p>
-                    </div>
-                  </button>
-                </div>
-
-                {/* PROGRESS OVERVIEW BY CATEGORIES */}
-                <div className="glass-panel p-4 rounded-2xl space-y-3">
-                  <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                    <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                      <i data-lucide="bar-chart-2" className="w-4 h-4 text-cyan-400"></i>
-                      Aperçu des 14 Catégories
-                    </h3>
-                    <button onClick={() => setActiveTab('progress')} className="text-[11px] text-cyan-400 hover:underline">Voir tout</button>
-                  </div>
-
-                  <div className="space-y-2.5">
-                    {Object.entries(CATEGORIES).slice(0, 5).map(([catId, name]) => {
-                      const stat = userProfile.categoryStats[catId] || { asked: 0, correct: 0 };
-                      const pct = stat.asked > 0 ? Math.round((stat.correct / stat.asked) * 100) : 0;
-                      return (
-                        <div key={catId} className="text-xs">
-                          <div className="flex justify-between text-slate-300 mb-1">
-                            <span className="truncate max-w-[200px]">{name}</span>
-                            <span className="font-semibold text-cyan-300">{pct}% ({stat.correct}/{stat.asked})</span>
-                          </div>
-                          <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-cyan-500 rounded-full transition-all duration-500" style={{ width: `${pct}%` }}></div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* --- TAB 2: ACTIVE QUIZ / SÉRIE EN COURS --- */}
-            {activeTab === 'quiz' && (
-              <div className="flex-1 flex flex-col justify-between space-y-3 animate-fade-in">
-                
-                {/* QUIZ COMPLETED SUMMARY VIEW */}
-                {quizState.isCompleted ? (
-                  <div className="glass-panel p-5 rounded-3xl space-y-4 my-auto border border-cyan-500/30 text-center">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-500 to-emerald-400 mx-auto flex items-center justify-center shadow-xl shadow-cyan-500/30">
-                      <i data-lucide="trophy" className="w-8 h-8 text-white"></i>
-                    </div>
-
-                    <div>
-                      <span className="text-xs font-semibold text-cyan-400 uppercase tracking-widest">Bilan de la Série</span>
-                      <h2 className="text-3xl font-black text-white mt-1">
-                        {quizState.score} / {quizState.questions.length}
-                      </h2>
-                      <p className="text-sm font-medium text-slate-300 mt-1">
-                        Taux de réussite : <span className="text-cyan-400 font-bold">{Math.round((quizState.score / quizState.questions.length) * 100)}%</span>
-                      </p>
-                    </div>
-
-                    <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-700/50 text-xs text-slate-300 leading-relaxed text-left space-y-1.5">
-                      <p className="font-bold text-cyan-300">Analyse de la Série :</p>
-                      {quizState.score >= 18 ? (
-                        <p className="text-emerald-400">Excellent niveau ! Vous êtes très proche des exigences de l'examen théorique du Permis Côtier (maximum 5 erreurs autorisées sur 40 en examen réel).</p>
-                      ) : quizState.score >= 14 ? (
-                        <p className="text-amber-300">Bon travail. Quelques confusions subsistent sur certaines catégories. Entraînez-vous spécifiquement sur vos erreurs.</p>
-                      ) : (
-                        <p className="text-rose-400">Niveau insuffisant pour l'examen. Révisez les règles de sécurité, le RIPAM et le balisage puis relancez une série.</p>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 pt-2">
-                      <button 
-                        onClick={startMistakesRevision}
-                        disabled={userProfile.mistakesHistory.length === 0}
-                        className="py-3 px-3 rounded-xl glass-button text-xs font-bold text-rose-300 border-rose-500/30 hover:bg-rose-500/20 disabled:opacity-40"
-                      >
-                        Réviser mes Erreurs
-                      </button>
-                      <button 
-                        onClick={() => startNewSeries('adaptive')}
-                        className="py-3 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/20"
-                      >
-                        Prochaine Série
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {/* PROGRESS BAR & QUESTION COUNTER */}
-                    <div>
-                      <div className="flex justify-between items-center text-xs font-semibold mb-1.5 text-slate-300">
-                        <span className="flex items-center gap-1.5">
-                          <i data-lucide="help-circle" className="w-3.5 h-3.5 text-cyan-400"></i>
-                          Question {quizState.currentIndex + 1} / {quizState.questions.length}
-                        </span>
-                        <span className="text-cyan-400 font-bold">Score : {quizState.score}</span>
-                      </div>
-
-                      <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700/50">
-                        <div 
-                          className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-300"
-                          style={{ width: `${((quizState.currentIndex + 1) / quizState.questions.length) * 100}%` }}
-                        ></div>
-                      </div>
-
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-800/80 text-slate-400 border border-slate-700/50 truncate max-w-[240px]">
-                          {CATEGORIES[currentQ.categoryId]}
-                        </span>
-                        <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                          {currentQ.isMultiple ? "Plusieurs réponses possibles" : "Une seule réponse"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* QUESTION TEXT CARD */}
-                    <div className="glass-panel p-4 rounded-2xl border border-slate-700/60 space-y-3">
-                      <h2 className="text-sm font-bold text-white leading-snug">
-                        {currentQ.question}
-                      </h2>
-
-                      {/* DIAGRAM / VISUAL SCHEMATIC IF PRESENT */}
-                      {currentQ.diagramId && (
-                        <div className="my-2">
-                          <DiagramVisual id={currentQ.diagramId} />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* ANSWER OPTIONS LIST */}
-                    <div className="space-y-2 my-2">
-                      {currentQ.options.map((optionText, idx) => {
-                        const isSelected = quizState.selectedIndices.includes(idx);
-                        const isSubmitted = quizState.isSubmitted;
-                        const isCorrectOption = currentQ.correctIndices.includes(idx);
-
-                        let buttonStyle = "glass-button text-slate-200 border-slate-700/60 hover:bg-slate-800/80";
-                        let badgeIcon = null;
-
-                        if (isSelected && !isSubmitted) {
-                          buttonStyle = "bg-cyan-950/80 border-cyan-500 text-cyan-200 shadow-lg shadow-cyan-500/10";
-                        }
-
-                        if (isSubmitted) {
-                          if (isCorrectOption && isSelected) {
-                            // Correctly selected
-                            buttonStyle = "bg-emerald-950/90 border-emerald-500 text-emerald-200 font-medium";
-                            badgeIcon = <i data-lucide="check-circle-2" className="w-5 h-5 text-emerald-400 flex-shrink-0"></i>;
-                          } else if (isCorrectOption && !isSelected) {
-                            // Missed correct answer
-                            buttonStyle = "bg-amber-950/70 border-amber-500/80 text-amber-200 font-medium";
-                            badgeIcon = <i data-lucide="alert-circle" className="w-5 h-5 text-amber-400 flex-shrink-0"></i>;
-                          } else if (!isCorrectOption && isSelected) {
-                            // Wrongly selected
-                            buttonStyle = "bg-rose-950/90 border-rose-500 text-rose-200";
-                            badgeIcon = <i data-lucide="x-circle" className="w-5 h-5 text-rose-400 flex-shrink-0"></i>;
-                          } else {
-                            buttonStyle = "opacity-40 border-slate-800 text-slate-400";
-                          }
-                        }
-
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => handleOptionClick(idx)}
-                            disabled={isSubmitted}
-                            className={`w-full p-3.5 rounded-2xl text-left text-xs font-medium flex items-center justify-between gap-3 active:scale-[0.99] transition-all min-h-[52px] ${buttonStyle}`}
-                          >
-                            <div className="flex items-center gap-2.5">
-                              <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-bold border ${
-                                isSelected ? "bg-cyan-500 text-slate-950 border-cyan-400" : "bg-slate-800/80 text-slate-400 border-slate-700"
-                              }`}>
-                                {String.fromCharCode(65 + idx)}
-                              </span>
-                              <span className="leading-snug">{optionText}</span>
-                            </div>
-                            {badgeIcon}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* SUBMIT / NEXT BUTTON & EXPLANATION PANEL */}
-                    {!quizState.isSubmitted ? (
-                      <button
-                        onClick={handleSubmitAnswer}
-                        disabled={quizState.selectedIndices.length === 0}
-                        className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 text-white font-bold text-sm shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 active:scale-95 transition-all mt-auto"
-                      >
-                        Valider ma réponse
-                        <i data-lucide="arrow-right" className="w-4 h-4"></i>
-                      </button>
-                    ) : (
-                      <div className="space-y-3 animate-fade-in mt-auto">
-                        {/* EXPLANATION CARD */}
-                        <div className="p-4 rounded-2xl glass-panel border border-cyan-500/30 space-y-2 bg-slate-900/90">
-                          <div className="flex items-center gap-2 text-xs font-bold text-cyan-400">
-                            <i data-lucide="book-open" className="w-4 h-4"></i>
-                            Explication Pédagogique
-                          </div>
-                          <p className="text-xs text-slate-300 leading-relaxed">
-                            {currentQ.rationale}
-                          </p>
-
-                          <div className="p-2.5 rounded-xl bg-cyan-950/50 border border-cyan-500/20 text-xs text-cyan-200 mt-2">
-                            <span className="font-bold text-cyan-400 block mb-0.5">📌 RÈGLE À RETENIR :</span>
-                            {currentQ.rule}
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={handleNextQuestion}
-                          className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 active:scale-95 transition-all"
-                        >
-                          {quizState.currentIndex < quizState.questions.length - 1 ? "Question Suivante" : "Terminer la Série"}
-                          <i data-lucide="chevron-right" className="w-4 h-4"></i>
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* --- TAB 3: MES MAUVAISES RÉPONSES --- */}
-            {activeTab === 'mistakes' && (
-              <div className="space-y-3 animate-fade-in">
-                <div className="flex justify-between items-center mb-1">
-                  <div>
-                    <h2 className="text-base font-bold text-white">Mes Mauvaises Réponses</h2>
-                    <p className="text-xs text-slate-400">{userProfile.mistakesHistory.length} erreur(s) enregistrée(s)</p>
-                  </div>
-                  {userProfile.mistakesHistory.length > 0 && (
-                    <button 
-                      onClick={startMistakesRevision}
-                      className="py-2 px-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold text-xs hover:bg-rose-500/30 active:scale-95 transition-all"
-                    >
-                      Lancer une révision
-                    </button>
-                  )}
-                </div>
-
-                {userProfile.mistakesHistory.length === 0 ? (
-                  <div className="glass-panel p-8 rounded-3xl text-center space-y-2">
-                    <i data-lucide="check-circle-2" className="w-12 h-12 text-emerald-400 mx-auto opacity-80"></i>
-                    <h3 className="text-sm font-bold text-white">Aucune erreur archivée !</h3>
-                    <p className="text-xs text-slate-400">Réalisez des séries de test pour identifier vos points d'amélioration.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2.5 max-h-[70vh] overflow-y-auto custom-scrollbar pr-1">
-                    {userProfile.mistakesHistory.map((item, idx) => (
-                      <div key={idx} className="glass-panel p-3.5 rounded-2xl space-y-2 border border-rose-500/20">
-                        <div className="flex justify-between items-start">
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-rose-950/80 text-rose-300 border border-rose-800/50">
-                            {CATEGORIES[item.categoryId]}
-                          </span>
-                          <span className="text-[10px] text-slate-400">
-                            {new Date(item.timestamp).toLocaleDateString('fr-FR')}
-                          </span>
-                        </div>
-
-                        <p className="text-xs font-bold text-white leading-snug">{item.questionText}</p>
-
-                        <div className="p-2.5 rounded-xl bg-slate-900/80 text-[11px] space-y-1">
-                          <p className="text-rose-400">
-                            <span className="font-bold">Votre réponse :</span> {item.userIndices.map(i => item.options[i]).join(', ')}
-                          </p>
-                          <p className="text-emerald-400">
-                            <span className="font-bold">Bonne réponse :</span> {item.correctIndices.map(i => item.options[i]).join(', ')}
-                          </p>
-                        </div>
-
-                        <div className="text-[11px] text-slate-300 bg-slate-800/40 p-2 rounded-lg border border-slate-700/50">
-                          <span className="font-bold text-cyan-400">Règle : </span>{item.rule}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* --- TAB 4: MA PROGRESSION / STATISTIQUES --- */}
-            {activeTab === 'progress' && (
-              <div className="space-y-4 animate-fade-in">
-                <div className="glass-panel p-4 rounded-3xl border border-cyan-500/20 space-y-3">
-                  <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="trending-up" className="w-4 h-4 text-cyan-400"></i>
-                    Bilan Global du Candidat
-                  </h2>
-
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="p-2.5 rounded-2xl bg-slate-800/60 border border-slate-700/50">
-                      <span className="block text-base font-bold text-white">{userProfile.totalQuestionsAnswered}</span>
-                      <span className="text-[9px] text-slate-400 uppercase">Questions</span>
-                    </div>
-                    <div className="p-2.5 rounded-2xl bg-slate-800/60 border border-slate-700/50">
-                      <span className="block text-base font-bold text-emerald-400">{userProfile.totalCorrectAnswers}</span>
-                      <span className="text-[9px] text-slate-400 uppercase">Réussies</span>
-                    </div>
-                    <div className="p-2.5 rounded-2xl bg-slate-800/60 border border-slate-700/50">
-                      <span className="block text-base font-bold text-cyan-400">{overallPercentage}%</span>
-                      <span className="text-[9px] text-slate-400 uppercase">Réussite</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* DETAILED STATS BY 14 CATEGORIES */}
-                <div className="glass-panel p-4 rounded-3xl space-y-3">
-                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                    Détail par catégorie officielle
-                  </h3>
-
-                  <div className="space-y-3 max-h-[55vh] overflow-y-auto custom-scrollbar pr-1">
-                    {Object.entries(CATEGORIES).map(([catId, name]) => {
-                      const stat = userProfile.categoryStats[catId] || { asked: 0, correct: 0 };
-                      const pct = stat.asked > 0 ? Math.round((stat.correct / stat.asked) * 100) : 0;
-                      
-                      let badgeColor = "text-slate-400 bg-slate-800";
-                      if (stat.asked > 0) {
-                        if (pct >= 80) badgeColor = "text-emerald-400 bg-emerald-950/60 border-emerald-500/30";
-                        else if (pct >= 60) badgeColor = "text-amber-400 bg-amber-950/60 border-amber-500/30";
-                        else badgeColor = "text-rose-400 bg-rose-950/60 border-rose-500/30";
-                      }
-
-                      return (
-                        <div key={catId} className="p-2.5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1.5">
-                          <div className="flex justify-between items-center text-xs">
-                            <span className="font-semibold text-slate-200 truncate max-w-[220px]">{name}</span>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${badgeColor}`}>
-                              {stat.asked > 0 ? `${pct}% (${stat.correct}/${stat.asked})` : "Non testé"}
-                            </span>
-                          </div>
-                          <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-500 ${pct >= 80 ? 'bg-emerald-500' : pct >= 60 ? 'bg-amber-500' : 'bg-rose-500'}`}
-                              style={{ width: `${pct}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* --- TAB 5: HISTORIQUE DES SÉRIES --- */}
-            {activeTab === 'history' && (
-              <div className="space-y-3 animate-fade-in">
-                <h2 className="text-base font-bold text-white mb-2">Historique des Séries</h2>
-
-                {userProfile.completedSeriesLog.length === 0 ? (
-                  <div className="glass-panel p-8 rounded-3xl text-center space-y-2">
-                    <i data-lucide="history" className="w-12 h-12 text-slate-500 mx-auto"></i>
-                    <h3 className="text-sm font-bold text-white">Aucune série terminée</h3>
-                    <p className="text-xs text-slate-400">Lancez la série 1 pour démarrer l'enregistrement de vos résultats.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2 max-h-[70vh] overflow-y-auto custom-scrollbar pr-1">
-                    {userProfile.completedSeriesLog.map((log, idx) => (
-                      <div key={idx} className="glass-panel p-3.5 rounded-2xl flex justify-between items-center border border-slate-800">
-                        <div>
-                          <span className="text-xs font-bold text-white">Série {log.seriesNumber} ({log.mode})</span>
-                          <p className="text-[10px] text-slate-400 mt-0.5">{log.date}</p>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-sm font-black text-cyan-400">{log.score} / {log.total}</span>
-                          <span className="block text-[10px] font-semibold text-slate-300">
-                            {Math.round((log.score / log.total) * 100)}%
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-          </main>
-
-          {/* BOTTOM NAVIGATION BAR (iOS GLASS STYLE) */}
-          <nav className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[92%] max-w-md glass-panel rounded-3xl p-1.5 border border-slate-700/60 shadow-2xl z-50 flex justify-around items-center">
-            <button 
-              onClick={() => setActiveTab('dashboard')}
-              className={`p-2 rounded-2xl flex flex-col items-center gap-0.5 transition-all ${
-                activeTab === 'dashboard' ? 'text-cyan-400 bg-slate-800/80 font-bold' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <i data-lucide="home" className="w-5 h-5"></i>
-              <span className="text-[9px]">Accueil</span>
-            </button>
-
-            <button 
-              onClick={() => setActiveTab('quiz')}
-              className={`p-2 rounded-2xl flex flex-col items-center gap-0.5 transition-all ${
-                activeTab === 'quiz' ? 'text-cyan-400 bg-slate-800/80 font-bold' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <i data-lucide="play" className="w-5 h-5"></i>
-              <span className="text-[9px]">Série</span>
-            </button>
-
-            <button 
-              onClick={() => setActiveTab('mistakes')}
-              className={`p-2 rounded-2xl flex flex-col items-center gap-0.5 transition-all relative ${
-                activeTab === 'mistakes' ? 'text-rose-400 bg-slate-800/80 font-bold' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <i data-lucide="x-circle" className="w-5 h-5"></i>
-              <span className="text-[9px]">Erreurs</span>
-              {userProfile.mistakesHistory.length > 0 && (
-                <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-              )}
-            </button>
-
-            <button 
-              onClick={() => setActiveTab('progress')}
-              className={`p-2 rounded-2xl flex flex-col items-center gap-0.5 transition-all ${
-                activeTab === 'progress' ? 'text-cyan-400 bg-slate-800/80 font-bold' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <i data-lucide="bar-chart" className="w-5 h-5"></i>
-              <span className="text-[9px]">Stats</span>
-            </button>
-
-            <button 
-              onClick={() => setActiveTab('history')}
-              className={`p-2 rounded-2xl flex flex-col items-center gap-0.5 transition-all ${
-                activeTab === 'history' ? 'text-cyan-400 bg-slate-800/80 font-bold' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <i data-lucide="clock" className="w-5 h-5"></i>
-              <span className="text-[9px]">Historique</span>
-            </button>
-          </nav>
-
         </div>
-      );
+        <div id="header-badge">
+            <span class="badge badge-blue">Série 1</span>
+        </div>
+    </div>
+
+    <!-- Dynamic Main Content -->
+    <div class="app-content" id="app-view">
+        <!-- View content will be injected dynamically via JS -->
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <button class="nav-item active" onclick="app.navigate('quiz')">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            Entraînement
+        </button>
+        <button class="nav-item" onclick="app.navigate('exam')">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Examen Blanc
+        </button>
+        <button class="nav-item" onclick="app.navigate('stats')">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            Progression
+        </button>
+        <button class="nav-item" onclick="app.navigate('weakness')">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            Faiblesses
+        </button>
+    </div>
+</div>
+
+<script>
+/**
+ * BANQUE DE QUESTIONS DYNAMIQUES & MOTEUR ADAPTATIF
+ */
+const QUESTION_BANK = [
+    {
+        id: 1,
+        category: "Balisage et signalisation maritime",
+        subCat: "Marques Cardinales",
+        question: "Quelle est la signification de cette balise cardinale et quel secteur de navigation sécurisée indique-t-elle ?",
+        svg: `<svg viewBox="0 0 200 120" width="100%" height="100%">
+            <rect width="200" height="120" fill="#0f172a"/>
+            <!-- Mer -->
+            <path d="M 0 90 Q 50 85 100 90 T 200 90 L 200 120 L 0 120 Z" fill="#0284c7" opacity="0.4"/>
+            <!-- Bouée Cardinale Nord -->
+            <rect x="93" y="40" width="14" height="25" fill="#1e293b"/>
+            <rect x="93" y="65" width="14" height="25" fill="#f59e0b"/>
+            <!-- Voyants flèches vers le haut -->
+            <polygon points="100,18 92,32 108,32" fill="#f59e0b"/>
+            <polygon points="100,28 92,40 108,40" fill="#f59e0b"/>
+        </svg>`,
+        options: [
+            { id: 'A', text: "Balise Cardinale Nord : Naviguer au Nord de la balise", correct: true },
+            { id: 'B', text: "Balise Cardinale Sud : Naviguer au Sud de la balise", correct: false },
+            { id: 'C', text: "Danger Isolé : Passer au large à plus de 2 milles", correct: false },
+            { id: 'D', text: "Marque Spéciale : Zone de chantier ou de câbles", correct: false }
+        ],
+        type: "single",
+        explanation: "Les deux cônes pointent vers le HAUT (Nord). La navigation en sécurité s'effectue dans le quadrant NORD de la balise.",
+        rule: "Cardinale NORD : 2 cônes vers le haut. Noir sur Jaune.",
+        difficulty: 2
+    },
+    {
+        id: 2,
+        category: "RIPAM / règles de barre et de route",
+        subCat: "Croisement Voilier/Moteur",
+        question: "Un navire à moteur rencontre un voilier naviguant à la voile sur des routes convergentes. Qui est prioritaire ?",
+        svg: `<svg viewBox="0 0 200 120" width="100%" height="100%">
+            <rect width="200" height="120" fill="#0f172a"/>
+            <!-- Navire Moteur -->
+            <g transform="translate(40,60)">
+                <path d="M0,10 L30,10 L40,0 L30,-10 L0,-10 Z" fill="#94a3b8"/>
+                <text x="-5" y="25" fill="#fff" font-size="10">Moteur</text>
+            </g>
+            <!-- Voilier -->
+            <g transform="translate(130,30)">
+                <path d="M0,10 L25,10 L35,0 L25,-10 L0,-10 Z" fill="#38bdf8"/>
+                <line x1="15" y1="-10" x2="15" y2="-30" stroke="#fff" stroke-width="2"/>
+                <polygon points="15,-30 30,-12 15,-12" fill="#fff"/>
+                <text x="-5" y="25" fill="#fff" font-size="10">Voilier</text>
+            </g>
+        </svg>`,
+        options: [
+            { id: 'A', text: "Le voilier est le navire privilégié (prioritaire)", correct: true },
+            { id: 'B', text: "Le navire à moteur est prioritaire s'il vient de tribord", correct: false },
+            { id: 'C', text: "Le voilier doit s'écarter car il s'agit d'un croisement à droite", correct: false },
+            { id: 'D', text: "Le navire à moteur doit manœuvrer en s'écartant franchement", correct: true }
+        ],
+        type: "multiple",
+        optionsCountText: "Plusieurs réponses possibles",
+        explanation: "Un navire à moteur doit s'écarter de la route d'un voilier en navigation à la voile. Le voilier est privilégié et le navire à moteur doit manœuvrer clairement.",
+        rule: "Un navire à moteur cède TOUJOURS la route à un voilier sous voiles seules (sauf rattrapage ou chenal étroit).",
+        difficulty: 3
+    },
+    {
+        id: 3,
+        category: "Feux et marques",
+        subCat: "Feux de navires",
+        question: "De nuit, vous observez un feu blanc au-dessus d'un feu vert et d'un feu rouge. Quel est ce navire ?",
+        svg: `<svg viewBox="0 0 200 120" width="100%" height="100%">
+            <rect width="200" height="120" fill="#020617"/>
+            <circle cx="100" cy="30" r="8" fill="#ffffff" filter="drop-shadow(0 0 8px #fff)"/>
+            <circle cx="75" cy="70" r="8" fill="#ef4444" filter="drop-shadow(0 0 8px #ef4444)"/>
+            <circle cx="125" cy="70" r="8" fill="#22c55e" filter="drop-shadow(0 0 8px #22c55e)"/>
+        </svg>`,
+        options: [
+            { id: 'A', text: "Un navire à moteur de moins de 50m vu de face", correct: true },
+            { id: 'B', text: "Un voilier de moins de 7 mètres", correct: false },
+            { id: 'C', text: "Un navire de pêche en chalutage", correct: false },
+            { id: 'D', text: "Un navire au mouillage de plus de 100m", correct: false }
+        ],
+        type: "single",
+        explanation: "Le feu blanc de tête de mât combiné aux feux de côté (rouge à bâbord, vert à tribord) visibles simultanément indique un navire à moteur de moins de 50 mètres vu exactement de face.",
+        rule: "Navire à moteur < 50m de face : Feu de mât blanc + Feu vert (Tribord) + Feu rouge (Bâbord).",
+        difficulty: 2
+    },
+    {
+        id: 4,
+        category: "Météorologie",
+        subCat: "Échelle de Beaufort",
+        question: "Sur la carte météo ou la VHF, un avis de coup de vent correspond à quel degré sur l'échelle de Beaufort ?",
+        svg: null,
+        options: [
+            { id: 'A', text: "Force 6", correct: false },
+            { id: 'B', text: "Force 8", correct: true },
+            { id: 'C', text: "Force 10", correct: false },
+            { id: 'D', text: "Force 12", correct: false }
+        ],
+        type: "single",
+        explanation: "Un 'Coup de vent' correspond exactement à la Force 8 sur l'échelle de Beaufort (vent moyen de 34 à 40 nœuds). Grand frais = Force 7, Tempête = Force 10.",
+        rule: "Grand Frais = F7 (28-33 nds) | Coup de Vent = F8 (34-40 nds) | Fort Coup de Vent = F9 (41-47 nds).",
+        difficulty: 3
+    },
+    {
+        id: 5,
+        category: "Sécurité",
+        subCat: "Matériel d'armement",
+        question: "En catégorie d'armement BÂTIQUE (jusqu'à 6 milles d'un abri), quels équipements de sécurité sont obligatoires à bord ?",
+        svg: null,
+        options: [
+            { id: 'A', text: "Gilet de sauvetage 100N (ou adapté à la morphologie) par personne", correct: true },
+            { id: 'B', text: "Dispositif lumineux d'étanchéité / repérage individuel", correct: true },
+            { id: 'C', text: "Radeau de survie hauturier", correct: false },
+            { id: 'D', text: "3 feux de détresse à main", correct: true }
+        ],
+        type: "multiple",
+        optionsCountText: "Sélectionnez tous les éléments obligatoires en côtière/côtier",
+        explanation: "En armement hauturier (>6 milles), le radeau est obligatoire. En côtière (jusqu'à 6 milles), les gilets (100N min), le moyen de repérage lumineux et les 3 feux à main restent obligatoires.",
+        rule: "Armement Côtier (2 à 6 milles) : Gilets 100N + Repérage lumineux + 3 Feux à main + Annuaire des marées + Compas.",
+        difficulty: 4
+    }
+];
+
+// App State (Persistant local storage)
+class AppState {
+    constructor() {
+        this.load();
     }
 
-    // Render application
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
+    load() {
+        const saved = localStorage.getItem('permis_cotier_app_data');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            this.currentQuestionIndex = parsed.currentQuestionIndex || 0;
+            this.score = parsed.score || 0;
+            this.history = parsed.history || [];
+            this.stats = parsed.stats || { total: 0, correct: 0, errors: 0, byCat: {} };
+            this.errorsList = parsed.errorsList || [];
+            this.weakPoints = parsed.weakPoints || {};
+        } else {
+            this.reset();
+        }
+    }
 
-    // Initialize Lucide Icons after render
-    setTimeout(() => {
-      if (window.lucide) {
-        window.lucide.createIcons();
-      }
-    }, 200);
-  </script>
+    save() {
+        const data = {
+            currentQuestionIndex: this.currentQuestionIndex,
+            score: this.score,
+            history: this.history,
+            stats: this.stats,
+            errorsList: this.errorsList,
+            weakPoints: this.weakPoints
+        };
+        localStorage.setItem('permis_cotier_app_data', JSON.stringify(data));
+    }
+
+    reset() {
+        this.currentQuestionIndex = 0;
+        this.score = 0;
+        this.history = [];
+        this.stats = { total: 0, correct: 0, errors: 0, byCat: {} };
+        this.errorsList = [];
+        this.weakPoints = {};
+        this.save();
+    }
+
+    registerAnswer(question, userSelections, isCorrect) {
+        this.stats.total++;
+        if (isCorrect) {
+            this.stats.correct++;
+            this.score++;
+        } else {
+            this.stats.errors++;
+            this.errorsList.push({ question, userSelections, date: new Date().toLocaleDateString() });
+            this.weakPoints[question.category] = (this.weakPoints[question.category] || 0) + 1;
+        }
+
+        if (!this.stats.byCat[question.category]) {
+            this.stats.byCat[question.category] = { total: 0, correct: 0 };
+        }
+        this.stats.byCat[question.category].total++;
+        if (isCorrect) this.stats.byCat[question.category].correct++;
+
+        this.save();
+    }
+}
+
+// Global App Logic
+class PermisApp {
+    constructor() {
+        this.state = new AppState();
+        this.currentView = 'quiz';
+        this.selectedOptions = new Set();
+        this.isAnswerValidated = false;
+        this.init();
+    }
+
+    init() {
+        this.navigate('quiz');
+    }
+
+    navigate(view) {
+        this.currentView = view;
+        const container = document.getElementById('app-view');
+        
+        // Update Active Nav Item
+        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+        
+        if (view === 'quiz') {
+            this.renderQuizView(container);
+        } else if (view === 'exam') {
+            this.renderExamView(container);
+        } else if (view === 'stats') {
+            this.renderStatsView(container);
+        } else if (view === 'weakness') {
+            this.renderWeaknessView(container);
+        }
+    }
+
+    renderQuizView(container) {
+        const qIndex = this.state.currentQuestionIndex;
+        if (qIndex >= QUESTION_BANK.length) {
+            this.renderSummaryView(container);
+            return;
+        }
+
+        const q = QUESTION_BANK[qIndex];
+        this.selectedOptions.clear();
+        this.isAnswerValidated = false;
+
+        document.getElementById('header-subtitle').innerText = `Question ${qIndex + 1} / ${QUESTION_BANK.length}`;
+
+        let svgHTML = q.svg ? `<div class="svg-container">${q.svg}</div>` : '';
+
+        let optionsHTML = q.options.map(opt => `
+            <div class="option-card" id="option-${opt.id}" onclick="app.toggleOption('${opt.id}', '${q.type}')">
+                <div class="option-badge">${opt.id}</div>
+                <div class="option-text">${opt.text}</div>
+            </div>
+        `).join('');
+
+        container.innerHTML = `
+            <div style="display:flex; justify-between; align-items:center;">
+                <span class="badge badge-blue">${q.category}</span>
+                <span style="font-size: 12px; color: var(--text-muted);">Niveau ${q.difficulty}/5</span>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: ${((qIndex) / QUESTION_BANK.length) * 100}%"></div>
+            </div>
+
+            <div class="glass-card">
+                <h3 style="font-size: 15px; font-weight: 600; line-height: 1.4;">${q.question}</h3>
+            </div>
+
+            ${svgHTML}
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                ${optionsHTML}
+            </div>
+
+            <div id="feedback-area"></div>
+
+            <button id="validate-btn" class="btn btn-primary" onclick="app.validateAnswer()" disabled style="opacity: 0.5;">
+                Valider la réponse
+            </button>
+        `;
+    }
+
+    toggleOption(optionId, type) {
+        if (this.isAnswerValidated) return;
+
+        if (type === 'single') {
+            this.selectedOptions.clear();
+            this.selectedOptions.add(optionId);
+            document.querySelectorAll('.option-card').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`option-${optionId}`).classList.add('selected');
+        } else {
+            if (this.selectedOptions.has(optionId)) {
+                this.selectedOptions.delete(optionId);
+                document.getElementById(`option-${optionId}`).classList.remove('selected');
+            } else {
+                this.selectedOptions.add(optionId);
+                document.getElementById(`option-${optionId}`).classList.add('selected');
+            }
+        }
+
+        const btn = document.getElementById('validate-btn');
+        if (this.selectedOptions.size > 0) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        } else {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        }
+    }
+
+    validateAnswer() {
+        if (this.isAnswerValidated || this.selectedOptions.size === 0) return;
+        this.isAnswerValidated = true;
+
+        const q = QUESTION_BANK[this.state.currentQuestionIndex];
+        const correctIds = q.options.filter(o => o.correct).map(o => o.id);
+        const userSelections = Array.from(this.selectedOptions);
+
+        // Check exact match for single or multiple
+        const isCorrect = correctIds.length === userSelections.length &&
+            correctIds.every(id => userSelections.includes(id));
+
+        // Highlight cards
+        q.options.forEach(opt => {
+            const card = document.getElementById(`option-${opt.id}`);
+            if (opt.correct) {
+                card.classList.add('correct');
+            } else if (userSelections.includes(opt.id)) {
+                card.classList.add('incorrect');
+            }
+        });
+
+        // Feedback Section
+        const feedbackArea = document.getElementById('feedback-area');
+        feedbackArea.innerHTML = `
+            <div class="glass-card feedback-box" style="border-left: 4px solid ${isCorrect ? 'var(--accent-green)' : 'var(--accent-red)'}">
+                <div style="font-weight: 800; color: ${isCorrect ? 'var(--accent-green)' : 'var(--accent-red)'}; margin-bottom: 6px;">
+                    ${isCorrect ? '✓ CORRECT' : '✗ INCORRECT'}
+                </div>
+                <div style="font-size: 13px; color: var(--text-main); margin-bottom: 8px;">${q.explanation}</div>
+                <div style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; color: var(--accent-orange);">
+                    📌 <strong>À RETENIR :</strong> ${q.rule}
+                </div>
+            </div>
+        `;
+
+        this.state.registerAnswer(q, userSelections, isCorrect);
+
+        // Update button action
+        const btn = document.getElementById('validate-btn');
+        btn.innerText = "Question Suivante →";
+        btn.className = "btn btn-success";
+        btn.onclick = () => {
+            this.state.currentQuestionIndex++;
+            this.state.save();
+            this.renderQuizView(document.getElementById('app-view'));
+        };
+    }
+
+    renderSummaryView(container) {
+        const score = this.state.score;
+        const total = QUESTION_BANK.length;
+        const pct = Math.round((score / total) * 100);
+
+        container.innerHTML = `
+            <div class="glass-card" style="text-align: center; padding: 24px;">
+                <h2 style="font-size: 20px; margin-bottom: 8px;">Série Terminée !</h2>
+                <div style="font-size: 42px; font-weight: 900; color: var(--accent-blue); margin: 12px 0;">
+                    ${score} / ${total}
+                </div>
+                <span class="badge ${pct >= 80 ? 'badge-green' : 'badge-orange'}">${pct}% de Réussite</span>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <div style="font-size: 11px; color: var(--text-muted);">Bonnes réponses</div>
+                    <div class="stat-val" style="color: var(--accent-green);">${score}</div>
+                </div>
+                <div class="stat-box">
+                    <div style="font-size: 11px; color: var(--text-muted);">Erreurs</div>
+                    <div class="stat-val" style="color: var(--accent-red);">${total - score}</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="app.restart()">
+                Recommencer une série
+            </button>
+        `;
+    }
+
+    renderExamView(container) {
+        container.innerHTML = `
+            <div class="glass-card" style="text-align: center;">
+                <span class="badge badge-orange" style="margin-bottom: 12px;">Mode Officiel</span>
+                <h3>Examen Blanc Permis Côtier</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin: 12px 0; line-height: 1.5;">
+                    40 Questions • Max 5 erreurs tolérées.<br>
+                    Aucun indice ni correction immédiate pendant l'épreuve.
+                </p>
+                <button class="btn btn-primary" onclick="alert('Lancement de la simulation d\'Examen Blanc (40 questions).')">
+                    Démarrer l'Examen Blanc
+                </button>
+            </div>
+        `;
+    }
+
+    renderStatsView(container) {
+        const stats = this.state.stats;
+        container.innerHTML = `
+            <div class="glass-card">
+                <h3>Progression Globale</h3>
+                <div class="stat-grid" style="margin-top: 14px;">
+                    <div class="stat-box">
+                        <div style="font-size: 11px; color: var(--text-muted);">Questions vues</div>
+                        <div class="stat-val">${stats.total}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div style="font-size: 11px; color: var(--text-muted);">Taux de succès</div>
+                        <div class="stat-val" style="color: var(--accent-green);">
+                            ${stats.total ? Math.round((stats.correct / stats.total) * 100) : 0}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderWeaknessView(container) {
+        const errors = this.state.errorsList;
+        let content = errors.length === 0 ? 
+            `<div class="glass-card"><p style="font-size: 13px; color: var(--text-muted);">Aucune erreur enregistrée pour le moment. Continuez à vous entraîner !</p></div>` :
+            errors.map(e => `
+                <div class="glass-card" style="margin-bottom: 10px;">
+                    <span class="badge badge-orange" style="margin-bottom: 6px;">${e.question.category}</span>
+                    <p style="font-size: 13px; font-weight: 600;">${e.question.question}</p>
+                    <p style="font-size: 12px; color: var(--accent-red); margin-top: 6px;"><strong>Règle :</strong> ${e.question.rule}</p>
+                </div>
+            `).join('');
+
+        container.innerHTML = `
+            <div>
+                <h3 style="margin-bottom: 12px;">Révision de vos Faiblesses</h3>
+                ${content}
+            </div>
+        `;
+    }
+
+    restart() {
+        this.state.reset();
+        this.renderQuizView(document.getElementById('app-view'));
+    }
+}
+
+// Initialisation globale de l'application
+const app = new PermisApp();
+</script>
 </body>
 </html>
